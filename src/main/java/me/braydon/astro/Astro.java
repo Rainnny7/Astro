@@ -40,6 +40,7 @@ public class Astro {
 
     private final int port;
     private final Gson gson;
+    private final List<Object> routes;
 
     @Getter(AccessLevel.NONE) private HttpServer httpServer;
     private boolean running;
@@ -47,14 +48,11 @@ public class Astro {
     private Astro(int port, Gson gson, List<Object> routes) {
         this.port = port;
         this.gson = gson;
+        this.routes = routes;
 
-        // Adding the routes
+        // If there are no routes provided, log a warning
         if (routes.isEmpty()) {
             log.warn("There were no routes provided");
-        } else {
-            for (Object classInstance : routes) {
-                addRoute(classInstance);
-            }
         }
 
         // Creating the HTTP server
@@ -77,6 +75,9 @@ public class Astro {
         }
         running = true;
         httpServer.start();
+        for (Object classInstance : routes) {
+            addRoute(classInstance);
+        }
         log.info("Started listening on port " + port);
         return this;
     }
