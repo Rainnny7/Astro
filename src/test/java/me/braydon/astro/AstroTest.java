@@ -1,5 +1,7 @@
 package me.braydon.astro;
 
+import com.zaxxer.hikari.HikariConfig;
+import me.braydon.astro.mysql.MySQLConnector;
 import me.braydon.astro.route.PersonRoute;
 import org.junit.jupiter.api.Test;
 
@@ -13,6 +15,13 @@ public class AstroTest {
     public void runTest() {
         // Starts the Astro server on port 8080 with the PersonRoute
         Astro astro = Astro.builder(8080)
+                .withMySQLConnector(new MySQLConnector(new HikariConfig() {{ // This is only needed if you plan to use MySQL
+                    setJdbcUrl("jdbc:mysql://localhost:3306/astro");
+                    setUsername("astro");
+                    setPassword("p4$$w0rd");
+                }}))
+                // Adding the person route - It's important that if you're using MySQL
+                // that routes are added after setting the MySQL connector
                 .addRoute(new PersonRoute())
                 .build().start();
 

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.braydon.astro.exception.AstroException;
 import me.braydon.astro.exception.RestPathException;
+import me.braydon.astro.mysql.MySQLConnector;
 import me.braydon.astro.route.*;
 
 import java.io.IOException;
@@ -41,14 +42,16 @@ public class Astro {
     private final int port;
     private final Gson gson;
     private final List<Object> routes;
+    private final MySQLConnector mySQLConnector;
 
     @Getter(AccessLevel.NONE) private HttpServer httpServer;
     private boolean running;
 
-    private Astro(int port, Gson gson, List<Object> routes) {
+    private Astro(int port, Gson gson, List<Object> routes, MySQLConnector mySQLConnector) {
         this.port = port;
         this.gson = gson;
         this.routes = routes;
+        this.mySQLConnector = mySQLConnector;
 
         // If there are no routes provided, log a warning
         if (routes.isEmpty()) {
@@ -180,6 +183,7 @@ public class Astro {
         private final int port;
         private Gson gson = DEFAULT_GSON;
         private final List<Object> routes = new ArrayList<>();
+        private MySQLConnector mySQLConnector;
 
         /**
          * Provide your own {@link Gson} provider for Astro to use.
@@ -202,12 +206,22 @@ public class Astro {
         }
 
         /**
+         * Set the connector to use for MySQL.
+         *
+         * @param mySQLConnector the mysql connector
+         */
+        public AstroBuilder withMySQLConnector(MySQLConnector mySQLConnector) {
+            this.mySQLConnector = mySQLConnector;
+            return this;
+        }
+
+        /**
          * Build a new instance of Astro.
          *
          * @return the built instance
          */
         public Astro build() {
-            return new Astro(port, gson, routes);
+            return new Astro(port, gson, routes, mySQLConnector);
         }
     }
 }
