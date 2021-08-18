@@ -1,5 +1,4 @@
-![Astro](https://raw.githubusercontent.com/Rainnny7/Astro/master/assets/logo.jpg)
-# Astro
+# ![Astro](assets/logo.jpg) Astro
 Astro is a lightweight and easy-to-use RESTful library.
 
 ## Compiling
