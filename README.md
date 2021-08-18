@@ -6,6 +6,37 @@ Astro is a lightweight and easy-to-use RESTful library.
 - Open the project in your IDE of choice
 - Run `mvn clean install`
 
+## Dependency
+### Maven
+```xml
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+
+<dependency>
+    <groupId>com.github.Rainnny7</groupId>
+    <artifactId>Astro</artifactId>
+    <version>VERSION</version>
+</dependency>
+```
+
+### Gradle
+```groovy
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
+}
+
+dependencies {
+    implementation 'com.github.Rainnny7:Astro:VERSION'
+}
+```
+
 ## Example Usage
 ```java
 public class AstroExample {
