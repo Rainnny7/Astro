@@ -22,6 +22,6 @@ public final class PersonRepository extends MySQLRepository<Person> {
      * @see Person for people
      */
     public List<Person> byFirstName(String firstName) {
-        return filter(new ColumnFilter("firstName", firstName));
+        return findAll(new ColumnFilter("firstName", firstName));
     }
 }

@@ -29,34 +29,30 @@ public abstract class MySQLRepository<T extends Modal> {
     }
 
     /**
-     * Filter a single {@link Modal} in a MySQL table by the given filters.
+     * Get a {@link Modal} from the table with optional filters.
      *
-     * @param filters the filters to use
+     * @param filters the optional filters to use
      * @return the filtered modal.
      * @see ColumnFilter for filter
      */
-    public final <T extends Modal> T filterOne(ColumnFilter... filters) {
-        List<T> modals = filter(filters);
+    public final T find(ColumnFilter... filters) {
+        List<T> modals = findAll(filters);
         return modals.isEmpty() ? null : modals.get(0);
     }
 
     /**
-     * Filter {@link Modal}'s in a MySQL table by the given filters.
+     * Get a list of {@link Modal}'s from the table with optional filters.
      *
-     * @param filters the filters to use
+     * @param filters the optional filters to use
      * @return the filtered modals.
      * @see ColumnFilter for filter
      */
     @SneakyThrows
-    public final <T extends Modal> List<T> filter(ColumnFilter... filters) {
-        // If there are no filters provided, throw an exception
-        if (filters.length < 1) {
-            throw new IllegalArgumentException("There must be at least one filter provided");
-        }
+    public final List<T> findAll(ColumnFilter... filters) {
         Table table = clazz.getAnnotation(Table.class);
 
         // Constructing the query string to execute
-        StringBuilder queryStringBuilder = new StringBuilder("SELECT * FROM `" + table.name() + "` WHERE ");
+        StringBuilder queryStringBuilder = new StringBuilder("SELECT * FROM `" + table.name() + "`" + (filters.length > 0 ? " WHERE " : ""));
         for (int i = 0; i < filters.length; i++) {
             ColumnFilter filter = filters[i];
             queryStringBuilder.append(i > 0 ? " AND " : "").append("`").append(filter.getColumn()).append("` = '")
