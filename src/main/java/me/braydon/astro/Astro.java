@@ -105,6 +105,10 @@ public class Astro {
      */
     private void addRoute(Object classInstance) {
         Class<?> clazz = classInstance.getClass();
+        if (!clazz.isAnnotationPresent(Route.class)) {
+            throw new IllegalArgumentException("Provided class does not annotate @Route");
+        }
+        Route route = clazz.getAnnotation(Route.class);
         int pathsAdded = 0;
         for (Method method : clazz.getDeclaredMethods()) {
             // If the method does not have the @RestPath annotation, continue
@@ -116,8 +120,14 @@ public class Astro {
             if (parameterTypes.length < 2 || (parameterTypes[0] != Request.class || parameterTypes[1] != Response.class)) {
                 throw new IllegalArgumentException("Method " + method.getName() + " in route " + clazz.getSimpleName() + " has improperly defined parameters, expected Request and Response");
             }
-            RestPath path = method.getAnnotation(RestPath.class);
-            httpServer.createContext(path.path(), httpExchange -> {
+            RestPath restPath = method.getAnnotation(RestPath.class);
+
+            String path = restPath.path();
+            if (!route.path().isEmpty()) {
+                path = route.path() + path;
+            }
+
+            httpServer.createContext(path, httpExchange -> {
                 Request request = new Request(httpExchange);
                 log.info("Handling request from " + request.getAddress().toString() + " on " + request.getURI().toString()); // Log the request
                 Response response = new Response();
@@ -130,15 +140,15 @@ public class Astro {
                                 Arrays.stream(RequestMethod.values()).map(RequestMethod::name).collect(Collectors.joining(", "))
                         ));
                     }
-                    // Invoke the path method and get the result
+                    // Invoke the restPath method and get the result
                     Object returned = method.invoke(classInstance, request, response);
 
                     // If the method doesn't return void, add it to the json object
                     if (method.getReturnType() != Void.class) {
                         jsonObject.addProperty("success", true);
                         jsonObject.add("value", gson.toJsonTree(returned));
-                    } else if (path.method() == RequestMethod.GET) { // If the method returns void but the request method is get, throw an exception
-                        throw new AstroException("Request method is valid but the path returns void");
+                    } else if (restPath.method() == RequestMethod.GET) { // If the method returns void but the request method is get, throw an exception
+                        throw new AstroException("Request method is valid but the restPath returns void");
                     }
                 } catch (IllegalAccessException | InvocationTargetException | RestPathException ex) {
                     log.error("Failed handling request:"); // Log the error

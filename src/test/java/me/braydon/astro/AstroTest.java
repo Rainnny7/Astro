@@ -18,7 +18,7 @@ public class AstroTest {
                 .withMySQLConnector(new MySQLConnector(new HikariConfig() {{ // This is only needed if you plan to use MySQL
                     setJdbcUrl("jdbc:mysql://localhost:3306/astro");
                     setUsername("astro");
-                    setPassword("p4$$w0rd");
+                    setPassword("CgtD5YKnOH89IvkV0O8f");
                 }}))
                 // Adding the person route - It's important that if you're using MySQL
                 // that routes are added after setting the MySQL connector
