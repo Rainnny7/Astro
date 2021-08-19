@@ -64,11 +64,13 @@ public final class PersonRoute {
     private final PersonRepository repository = MySQLConnector.addRepository(new PersonRepository());
 
     /**
-     * Return a new {@link Person} object based on the provided name in the request.
+     * Return a list of people that have the same name as the one in
+     * the request parameter.
      *
      * @param request the request
      * @param response the response
      * @return the person
+     * @see Person for people
      * @throws RestPathException if the request does not contain a name
      */
     @RestPath(path = "/person", method = RequestMethod.GET)
