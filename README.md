@@ -43,6 +43,13 @@ public class AstroExample {
     public static void main(String[] args) {
         // Starts the Astro server on port 8080 with the PersonRoute
         Astro astro = Astro.builder(8080)
+                .withMySQLConnector(new MySQLConnector(new HikariConfig() {{ // This is only needed if you plan to use MySQL
+                    setJdbcUrl("jdbc:mysql://localhost:3306/astro");
+                    setUsername("astro");
+                    setPassword("p4$$w0rd");
+                }}))
+                // Adding the person route - It's important that if you're using MySQL
+                // that routes are added after setting the MySQL connector
                 .addRoute(new PersonRoute())
                 .build().start();
 
@@ -53,6 +60,9 @@ public class AstroExample {
 }
 
 public final class PersonRoute {
+    // Constructing the person repository and adding it
+    private final PersonRepository repository = MySQLConnector.addRepository(new PersonRepository());
+
     /**
      * Return a new {@link Person} object based on the provided name in the request.
      *
@@ -62,25 +72,44 @@ public final class PersonRoute {
      * @throws RestPathException if the request does not contain a name
      */
     @RestPath(path = "/person", method = RequestMethod.GET)
-    public Person getPerson(Request request, Response response) {
+    public List<Person> getPerson(Request request, Response response) {
         if (request.parameterCount() < 1) {
             response.responseCode(ResponseCode.BAD_REQUEST);
             throw new RestPathException("Missing person name");
         }
         // We do not need to provide a response code here as the default
         // one is 200 (OK).
-        return new Person(request.getParameter("name"));
+        return repository.byFirstName(request.getParameter("name"));
     }
 }
 
-@AllArgsConstructor @Getter
-public class Person {
-    private final String name;
+public final class PersonRepository extends MySQLRepository<Person> {
+    public PersonRepository() {
+        super(Person.class);
+    }
+
+    /**
+     * Get a list of people by their first name.
+     *
+     * @param firstName the first name
+     * @return the list
+     * @see Person for people
+     */
+    public List<Person> byFirstName(String firstName) {
+        return filter(new ColumnFilter("firstName", firstName));
+    }
+}
+
+@Table(name = "people") @Getter
+public class Person extends Modal {
+    @Column(type = ColumnType.INT) private long id;
+    @Column(type = ColumnType.VARCHAR) private String firstName, lastName;
+    @Column(type = ColumnType.INT) private int age;
 }
 ```
 
 ## TODO
-- [ ] MySQL Support
+- [x] MySQL Support
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

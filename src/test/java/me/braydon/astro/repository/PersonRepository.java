@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author Braydon
  */
-public class PersonRepository extends MySQLRepository<Person> {
+public final class PersonRepository extends MySQLRepository<Person> {
     public PersonRepository() {
         super(Person.class);
     }
