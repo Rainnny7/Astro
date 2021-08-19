@@ -8,6 +8,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import me.braydon.astro.common.AstroReflection;
+import me.braydon.astro.event.AstroEvent;
 import me.braydon.astro.exception.AstroException;
 import me.braydon.astro.exception.RestPathException;
 import me.braydon.astro.mysql.MySQLConnector;
@@ -41,27 +43,47 @@ public class Astro {
 
     private final int port;
     private final Gson gson;
+    private final List<AstroEvent> events;
     private final List<Object> routes;
     private final MySQLConnector mySQLConnector;
 
     @Getter(AccessLevel.NONE) private HttpServer httpServer;
+    private AstroReflection reflection;
     private boolean running;
 
-    private Astro(int port, Gson gson, List<Object> routes, MySQLConnector mySQLConnector) {
+    private Astro(int port, Gson gson, List<AstroEvent> events, List<Object> routes, MySQLConnector mySQLConnector) {
         this.port = port;
         this.gson = gson;
+        this.events = events;
         this.routes = routes;
         this.mySQLConnector = mySQLConnector;
 
-        // If there are no routes provided, log a warning
-        if (routes.isEmpty()) {
-            log.warn("There were no routes provided");
+        // Adding the default route
+        boolean addDefault = true;
+        for (Object route : routes) {
+            for (Method method : route.getClass().getDeclaredMethods()) {
+                if (!method.isAnnotationPresent(RestPath.class)) {
+                    continue;
+                }
+                RestPath path = method.getAnnotation(RestPath.class);
+                if (path.path().equals("/")) {
+                    addDefault = false;
+                    break;
+                }
+            }
+        }
+        if (addDefault) {
+            this.routes.add(new DefaultAstroRoute(this));
+        } else {
+            log.warn("Astro was initialized without a default route, events will not be handled");
         }
 
-        // Creating the HTTP server
+        // Creating the HTTP server and initializing AstroReflection
         try {
             httpServer = HttpServer.create(new InetSocketAddress(port), 0);
             httpServer.setExecutor(null);
+
+            reflection = new AstroReflection(httpServer);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -131,6 +153,12 @@ public class Astro {
                 Request request = new Request(httpExchange);
                 log.info("Handling request from " + request.getAddress().toString() + " on " + request.getURI().toString()); // Log the request
                 Response response = new Response();
+
+                // Handling events
+                for (AstroEvent event : events) {
+                    event.handle(request, response);
+                }
+
                 JsonObject jsonObject = new JsonObject();
                 try {
                     // If the request method is not supported, throw an exception.
@@ -192,6 +220,7 @@ public class Astro {
     public static class AstroBuilder {
         private final int port;
         private Gson gson = DEFAULT_GSON;
+        private final List<AstroEvent> events = new ArrayList<>();
         private final List<Object> routes = new ArrayList<>();
         private MySQLConnector mySQLConnector;
 
@@ -202,6 +231,28 @@ public class Astro {
          */
         public AstroBuilder withGson(Gson gson) {
             this.gson = gson;
+            return this;
+        }
+
+        /**
+         * Add the given event.
+         *
+         * @param event the event to add
+         */
+        public AstroBuilder addEvent(AstroEvent event) {
+            events.add(event);
+            return this;
+        }
+
+        /**
+         * Add the given array of routes.
+         *
+         * @param classInstances the array of routes to add
+         */
+        public AstroBuilder addRoutes(Object... classInstances) {
+            for (Object classInstance : classInstances) {
+                addRoute(classInstance);
+            }
             return this;
         }
 
@@ -231,7 +282,7 @@ public class Astro {
          * @return the built instance
          */
         public Astro build() {
-            return new Astro(port, gson, routes, mySQLConnector);
+            return new Astro(port, gson, events, routes, mySQLConnector);
         }
     }
 }

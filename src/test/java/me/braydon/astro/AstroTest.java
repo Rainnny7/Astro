@@ -20,6 +20,10 @@ public class AstroTest {
                     setUsername("astro");
                     setPassword("CgtD5YKnOH89IvkV0O8f");
                 }}))
+                // Adding an event - This will log every request made to the terminal
+                .addEvent((request, response) -> {
+                    System.out.println("Request on path \"" + request.getURI().toString() + "\"");
+                })
                 // Adding the person route - It's important that if you're using MySQL
                 // that routes are added after setting the MySQL connector
                 .addRoute(new PersonRoute())

@@ -1,5 +1,7 @@
 package me.braydon.astro.common;
 
+import lombok.experimental.UtilityClass;
+
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
@@ -8,6 +10,7 @@ import java.util.Map;
 /**
  * @author Braydon
  */
+@UtilityClass
 public class HTTPUtils {
     /**
      * Parse the given {@link URI} query and convert it to a {@link Map} of
