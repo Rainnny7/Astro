@@ -113,7 +113,7 @@ public class Person extends Modal {
 ## TODO
 - [x] MySQL Support
 - [x] Event System
-[ ] Add @NonNull annotations to make the code more understandable
+- [ ] Add @NonNull annotations to make the code more understandable
 - [ ] Custom 404 Pages
 - [ ] Static Pages
 - [ ] Multipart File Uploader
