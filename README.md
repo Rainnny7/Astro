@@ -1,6 +1,9 @@
 # ![Astro](assets/logo.jpg) Astro
 Astro is a lightweight and easy-to-use RESTful library.
 
+### Note
+This project is no-longer maintained, use at your own risk.
+
 ## Compiling
 - Clone the repository
 - Open the project in your IDE of choice

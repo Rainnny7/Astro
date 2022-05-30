@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -191,7 +192,8 @@ public class Astro {
                     ex.printStackTrace();
                 }
                 String json = gson.toJson(jsonObject); // Turn the json object into a readable json string
-                httpExchange.sendResponseHeaders(response.getResponseCode().getCode(), json.length()); // Set the response code and body lengh
+                httpExchange.getResponseHeaders().set("Content-Type", "application/json"); // Set the content type to json
+                httpExchange.sendResponseHeaders(response.getResponseCode().getCode(), json.length()); // Set the response code and body length
                 OutputStream responseBody = httpExchange.getResponseBody();
                 responseBody.write(json.getBytes()); // Writing the json to the response body
                 responseBody.close();
@@ -202,7 +204,7 @@ public class Astro {
         if (pathsAdded == 0) {
             log.warn("Couldn't find any paths to add in route " + clazz.getSimpleName());
         } else {
-            log.info("Added " + pathsAdded + " path for route " + clazz.getSimpleName());
+            log.info("Added " + pathsAdded + " paths for route " + clazz.getSimpleName());
         }
     }
 

@@ -29,12 +29,7 @@ public enum RequestMethod {
     /**
      * The DELETE method deletes the specified resource.
      */
-    DELETE,
-
-    /**
-     * Describes the communication options for the target resource.
-     */
-    OPTIONS;
+    DELETE;
 
     /**
      * Get the request method by the given name.

@@ -20,9 +20,7 @@ public class ResponseCode {
     public static final ResponseCode FORBIDDEN = new ResponseCode(403, "The client does not have access rights");
     public static final ResponseCode NOT_FOUND = new ResponseCode(404, "The server could not find the requested resource");
     public static final ResponseCode METHOD_NOT_ALLOWED = new ResponseCode(405, "The request method is known by the server but is not supported by the target resource");
-    public static final ResponseCode REQUEST_TIMEOUT = new ResponseCode(408, "The server did not receive a complete request message within the time that it was prepared to wait");
     public static final ResponseCode GONE = new ResponseCode(410, "The requested content has been permanently deleted from the server");
-    public static final ResponseCode PAYLOAD_TOO_LARGE = new ResponseCode(413, "The server refused to process a request because the payload is larger than the server is willing or able to process");
     public static final ResponseCode IM_A_TEAPOT = new ResponseCode(418, "The server refuses the attempt to brew coffee with a teapot");
     public static final ResponseCode TOO_MANY_REQUESTS = new ResponseCode(429, "The client has sent too many requests");
     public static final ResponseCode UNAVAILABLE_FOR_LEGAL_REASONS = new ResponseCode(451, "The client has requested a resource that cannot legally be provided");

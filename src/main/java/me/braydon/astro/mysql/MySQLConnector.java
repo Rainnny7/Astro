@@ -2,6 +2,7 @@ package me.braydon.astro.mysql;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import lombok.AccessLevel;
 import lombok.Getter;
 
 import java.util.HashSet;
@@ -10,7 +11,7 @@ import java.util.Set;
 /**
  * @author Braydon
  */
-@Getter
+@Getter(AccessLevel.PROTECTED)
 public class MySQLConnector {
     private static MySQLConnector INSTANCE;
     private static final Set<MySQLRepository<?>> repositories = new HashSet<>();
